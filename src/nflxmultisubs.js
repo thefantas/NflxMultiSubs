@@ -2,6 +2,7 @@ const console = require('./console');
 const JSZip = require('jszip');
 const kDefaultSettings = require('./default-settings');
 const PlaybackRateController = require('./playback-rate-controller');
+const FantasController = require('./fantas-controller');
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -46,6 +47,9 @@ let gSubtitles = [],
 let gMsgPort, gRendererLoop;
 let gVideoRatio = 1080 / 1920;
 let gRenderOptions = Object.assign({}, kDefaultSettings);
+let lastRenderedIds_ = undefined;
+let lastRenderedIdsBegin_ = undefined;
+let lines_ = undefined;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -77,11 +81,12 @@ class SubtitleBase {
     });
   }
 
-  deactivate() {
+  deactivate() {	
     this.active = false;
   }
 
   render(seconds, options, forced) {
+
     if (!this.active || this.state !== 'READY' || !this.lines) return [];
     const lines = this.lines.filter(
       line => line.begin <= seconds && seconds <= line.end
@@ -90,9 +95,17 @@ class SubtitleBase {
       .map(line => line.id)
       .sort()
       .toString();
-
+	const begin = lines
+      .map(line => line.begin)
+      .sort()
+      .toString();
     if (this.lastRenderedIds === ids && !forced) return null;
-    this.lastRenderedIds = ids;
+	this.lastRenderedIds = ids;
+	if (ids)
+		lastRenderedIds_ = ids;
+    if (begin)
+		lastRenderedIdsBegin_ = begin;
+	
     return this._render(lines, options);
   }
 
@@ -181,6 +194,7 @@ class TextSubtitle extends SubtitleBase {
           );
 
           this.lines = lines;
+		  //console.log(lines);
           resolve();
         });
     });
@@ -211,7 +225,11 @@ class TextSubtitle extends SubtitleBase {
     );
     text.setAttributeNS(null, 'opacity', options.secondaryTextOpacity);
     text.style.fontSize = `${fontSize * options.secondaryTextScale}px`;
-    text.style.fontFamily = 'Arial, Helvetica';
+    //text.style.fontFamily = 'Arial, Helvetica';
+    text.style.fontWeight = 'bolder';
+    //text.style.zIndex = '5';
+    text.style.textShadow = 'rgb(0, 0, 0) 1.414px 1.414px 1.53px, rgb(0, 0, 0) -1.414px 1.414px 1.53px, rgb(0, 0, 0) -1.414px -1.414px 1.53px, rgb(0, 0, 0) 1.414px -1.414px 1.53px, rgb(0, 0, 0) 2px 0px 1.53px, rgb(0, 0, 0) 0px 2px 1.53px, rgb(0, 0, 0) -2px 0px 1.53px, rgb(0, 0, 0) 0px -2px 1.53px, rgb(0, 0, 0) 0px 0px 7px';
+    //text.style.color = 'rgb(255, 226, 169)';
     text.style.fill = 'white';
     text.style.stroke = 'black';
     text.textContent = textContent;
@@ -621,9 +639,13 @@ class PrimaryTextTransformer {
     const opacity = options.primaryTextOpacity;
     const scale = options.primaryTextScale;
     const newFontSize = fontSize * scale;
+        //font-family: Arial, Helvetica;
     const styleText = `.player-timedtext-text-container span {
         font-size: ${newFontSize}px !important;
-        opacity: ${opacity};
+        font-weight: normal !important;
+        text-shadow: rgb(0, 0, 0) 1.414px 1.414px 1.53px, rgb(0, 0, 0) -1.414px 1.414px 1.53px, rgb(0, 0, 0) -1.414px -1.414px 1.53px, rgb(0, 0, 0) 1.414px -1.414px 1.53px, rgb(0, 0, 0) 2px 0px 1.53px, rgb(0, 0, 0) 0px 2px 1.53px, rgb(0, 0, 0) -2px 0px 1.53px, rgb(0, 0, 0) 0px -2px 1.53px, rgb(0, 0, 0) 0px 0px 7px !important;
+        opacity: ${opacity} !important;
+        color: rgb(255, 226, 169) !important;
       }`;
     style.textContent = styleText;
 
@@ -880,6 +902,41 @@ window.addEventListener('resize', evt => {
   );
 });
 
+    function getIDNetflix() {
+		var e;
+		try {
+			e = netflix.appContext.state.playerApp.getAPI().videoPlayer
+		} catch (t) {
+			try {
+				e = netflix.appContext.getPlayerApp().getAPI().videoPlayer
+			} catch (e) {
+				console.errorWithoutReport(e)
+			}
+		}
+		var t = e.getAllPlayerSessionIds(),
+			n = (t = Array.from(t))[t.length - 1];
+		if (2 <= t.length) {
+			var r = t.find(function(e) {
+				return /watch/i.test(e)
+			});
+			r && (n = r)
+		} else 0 === t.length && console.warn("Couldn't find out the playerSessionId");
+		return e.getVideoPlayerBySessionId(n)
+	}
+	
+window.addEventListener('keyup', evt => {
+		if (evt.ctrlKey || evt.altKey || evt.shiftKey || evt.metaKey) return;
+		if ((evt.keyCode !== 86)) return;
+		if (evt.keyCode === 86) {
+			var t = getIDNetflix(),
+				n = t.getCurrentTime();
+				s = lastRenderedIdsBegin_*1000;
+			t.seek(s-200);
+			t.getPaused() && t.play();
+			// console.log(lastRenderedIds_);
+			// console.log(lastRenderedIdsBegin_);
+		}
+	  });
 
 // -----------------------------------------------------------------------------
 
@@ -1140,3 +1197,7 @@ if (BROWSER === 'firefox') {
 // control video playback rate
 const playbackRateController = new PlaybackRateController();
 playbackRateController.activate();
+
+// control video Fantas
+const fantasController = new FantasController();
+fantasController.activate();
