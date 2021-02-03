@@ -368,7 +368,7 @@ class SubtitleFactory {
     }
     return this._buildTextBased(track, lang, bcp47);
   }
-
+  
   static isNoneTrack(track) {
     // new_track_id example"T:1:0;1;zh-Hant;1;1;"
     // the last bit is 1 for NoneTrack text tracks
@@ -408,7 +408,7 @@ const buildSubtitleList = textTracks => {
   // sorted by language in alphabetical order (to align with official UI)
   const subs = textTracks
     .filter(t => !t.isNoneTrack)
-    .filter(t => !SubtitleFactory.isNoneTrack(t))
+	.filter(t => !SubtitleFactory.isNoneTrack(t))
     .map(t => SubtitleFactory.build(t));
   return subs.concat(dummy);
 };
@@ -757,7 +757,7 @@ class RendererLoop {
     // FIXME: dirty transform & magic offets
     // this leads to a big gap between primary & secondary subtitles
     // when the progress bar is shown
-    this.subtitleWrapperElem.style.top = controlsActive ? '-100px' : '0';
+    //this.subtitleWrapperElem.style.top = controlsActive ? '-100px' : '0';
 
     // everything rendered, clear the dirty bit with ease
     this.isRenderDirty = false;
@@ -944,7 +944,7 @@ window.addEventListener('keyup', evt => {
 			var t = getIDNetflix(),
 				n = t.getCurrentTime();
 				s = lastRenderedIdsBegin_*1000;
-			t.seek(s-200);
+			t.seek(s-150);
 			t.getPaused() && t.play();
 			// console.log(lastRenderedIds_);
 			// console.log(lastRenderedIdsBegin_);
