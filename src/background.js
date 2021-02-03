@@ -12,7 +12,7 @@ function validateSettings(settings) {
   return keys.every(key => (key in settings));
 }
 
-
+// console.log(gSettings);
 chrome.storage.local.get(['settings'], (result) => {
   console.log('Loaded: settings=', result.settings);
   if (result.settings && validateSettings(result.settings))
@@ -26,6 +26,12 @@ function saveSettings() {
     console.log('Settings: saved into local storage');
   });
 }
+/* 
+document.addEventListener('NflxReceiver', function (e) {
+  var data = e.detail;
+  console.log('received', data);
+  alert("ok");
+}); */
 
 // ----------------------------------------------------------------------------
 
