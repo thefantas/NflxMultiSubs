@@ -41,8 +41,8 @@ const primarySizePresets = [
     primaryTextScale: 1.05,
   },
   { // x-large
-    primaryImageScale: 0.95,
-    primaryTextScale: 1.10,
+    primaryImageScale: 1.20,
+    primaryTextScale: 1.40,
   },
 ];
 
@@ -64,8 +64,8 @@ const secondarySizePresets = [
     secondaryTextScale: 1.10,
   },
   { // x-large
-    secondaryImageScale: 0.70,
-    secondaryTextScale: 1.20,
+    secondaryImageScale: 1.20,
+    secondaryTextScale: 1.40,
   },
 ];
 
