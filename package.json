@@ -2,7 +2,7 @@
   "name": "NflxMultiSubs",
   "description": "Bilingual Subtitles & Enhanced Experiences for Netflix with steroids",
   "author": "Dan Chen, Mod for John Vargas",
-  "version": "1.0.0",
+  "version": "2.1.2",
   "license": "MIT",
   "private": true,
   "scripts": {
