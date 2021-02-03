@@ -67,12 +67,12 @@ class FantasController {
 
   _keyUpHandler(evt) {
     if (evt.ctrlKey || evt.altKey || evt.shiftKey || evt.metaKey) return;
-    if ((evt.keyCode !== 66 ) && (evt.keyCode !== 81 ) && (evt.keyCode !== 78 /* ] */)) return;
+    if ((evt.keyCode !== 66 ) && (evt.keyCode !== 78 /* ] */)) return;
 
     const playerContainer = document.querySelector('.nf-player-container');
     if (!playerContainer) return;
 
-	if (evt.keyCode === 66 || evt.keyCode === 81) {//rewind
+	if (evt.keyCode === 66) {//rewind
 		var t = this._getIDNetflix(),
 			n = t.getCurrentTime();
 		t.seek(n < this.rewind ? 0 : n - this.rewind);
